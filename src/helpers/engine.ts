@@ -1,9 +1,24 @@
 import fs from "fs";
-export async function engine(path: string, obj: object) {
+function replaceKeys (partHtml: string, object: Object): string {
+    for (let key in object) {
+        partHtml = partHtml.replace(`~~${key}~~`, object[key])
+    }
+    return partHtml
+}
+export async function engine (path: string, item: object): Promise<string> {
     let html: string = await fs.promises.readFile(path, 'utf-8')
-    for (let key in obj) {
-        if (obj.hasOwnProperty(key)) {
-            html = html.replace(`~~${key}~~`, obj[key])
+    if (!Array.isArray(item)) {
+        replaceKeys(html, item)
+    } else {
+        if (html.includes('~~forEach~~')) {
+            let allExprs: string = html.slice(html.indexOf('~~forEach~~'), html.indexOf('~~/forEach') + 12)
+            let exprsContent: string  = html.slice(html.indexOf('~~forEach~~') + 11, html.indexOf('~~/forEach~~'))
+            let eachOne: string = ''
+            item.forEach(e => {
+                eachOne += replaceKeys(exprsContent, e)
+            })
+            html = html.replace(allExprs, eachOne)
+            //html = html.replace(html.slice(html.indexOf('~~forEach~~'), html.indexOf('~~/forEach') + 12), 'aaa') 
         }
     }
     return html
