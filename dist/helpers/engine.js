@@ -5,7 +5,13 @@ function replaceKeys (partHtml, object) {
     }
     return partHtml
 }
-
+function condition (partHtml, object) {
+    if (!object[partHtml.slice(partHtml.indexOf('~~if(') + 5, partHtml.indexOf(')~~'))]) {
+        partHtml = partHtml.replace(partHtml.slice(partHtml.indexOf('~~if('), partHtml.indexOf('~~/if~~') + 7), '')
+        return partHtml
+    }
+    return ''
+}
  async function engine (path, item) {
     let html = await _fs2.default.promises.readFile(path, 'utf-8')
     if (!Array.isArray(item)) {
@@ -21,9 +27,9 @@ function replaceKeys (partHtml, object) {
             html = html.replace(allExprs, eachOne)
         }
     }
-    if (/~~if.*?~~/.test(html)) {
-        if (item[html.slice(html.indexOf('~~if(') + 5, html.indexOf(')~~'))]) {
-            console.log('Deu certo')
+    for (let index = true; index == true; html = html.replace(/~~if.*?~~/, condition(html, item))) {
+        if (!/~~if.*?~~/.test(html)) {
+            index = false
         }
     }
     html = html.replace(/~~.*?~~/g, "")

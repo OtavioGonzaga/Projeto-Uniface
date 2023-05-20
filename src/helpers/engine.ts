@@ -5,11 +5,17 @@ function replaceKeys (partHtml: string, object: Object): string {
     }
     return partHtml
 }
-
+function condition (partHtml: string, object: object): string {
+    if (!object[partHtml.slice(partHtml.indexOf('~~if(') + 5, partHtml.indexOf(')~~'))]) {
+        partHtml = partHtml.replace(partHtml.slice(partHtml.indexOf('~~if('), partHtml.indexOf('~~/if~~') + 7), '')
+        return partHtml
+    }
+    return partHtml.slice(partHtml.indexOf('~~if('), partHtml.indexOf('~~/if~~') + 7), partHtml.slice(partHtml.indexOf(')~~') + 3, partHtml.indexOf('~~/if~~'))
+}
 export async function engine (path: string, item: object): Promise<string> {
     let html: string = await fs.promises.readFile(path, 'utf-8')
     if (!Array.isArray(item)) {
-        replaceKeys(html, item)
+        html = replaceKeys(html, item)
     } else {
         if (html.includes('~~forEach~~')) {
             let allExprs: string = html.slice(html.indexOf('~~forEach~~'), html.indexOf('~~/forEach') + 12)
@@ -21,11 +27,9 @@ export async function engine (path: string, item: object): Promise<string> {
             html = html.replace(allExprs, eachOne)
         }
     }
-    if (/~~if.*?~~/.test(html)) {
-        if (item[html.slice(html.indexOf('~~if(') + 5, html.indexOf(')~~'))]) {
-            console.log('Deu certo')
-        }
+    while (html.includes('~~if(')) {
+        html = html.replace(html.slice(html.indexOf('~~if('), html.indexOf('~~/if~~') + 7), condition(html, item))
     }
-    html = html.replace(/~~.*?~~/g, "")
+    // html = html.replace(/~~.*?~~/g, "")
     return html
 }
