@@ -5,6 +5,7 @@ function replaceKeys (partHtml, object) {
     }
     return partHtml
 }
+
  async function engine (path, item) {
     let html = await _fs2.default.promises.readFile(path, 'utf-8')
     if (!Array.isArray(item)) {
@@ -18,8 +19,13 @@ function replaceKeys (partHtml, object) {
                 eachOne += replaceKeys(exprsContent, e)
             })
             html = html.replace(allExprs, eachOne)
-            //html = html.replace(html.slice(html.indexOf('~~forEach~~'), html.indexOf('~~/forEach') + 12), 'aaa') 
         }
     }
+    if (/~~if.*?~~/.test(html)) {
+        if (item[html.slice(html.indexOf('~~if(') + 5, html.indexOf(')~~'))]) {
+            console.log('Deu certo')
+        }
+    }
+    html = html.replace(/~~.*?~~/g, "")
     return html
 } exports.engine = engine;

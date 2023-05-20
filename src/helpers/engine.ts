@@ -5,6 +5,7 @@ function replaceKeys (partHtml: string, object: Object): string {
     }
     return partHtml
 }
+
 export async function engine (path: string, item: object): Promise<string> {
     let html: string = await fs.promises.readFile(path, 'utf-8')
     if (!Array.isArray(item)) {
@@ -18,8 +19,13 @@ export async function engine (path: string, item: object): Promise<string> {
                 eachOne += replaceKeys(exprsContent, e)
             })
             html = html.replace(allExprs, eachOne)
-            //html = html.replace(html.slice(html.indexOf('~~forEach~~'), html.indexOf('~~/forEach') + 12), 'aaa') 
         }
     }
+    if (/~~if.*?~~/.test(html)) {
+        if (item[html.slice(html.indexOf('~~if(') + 5, html.indexOf(')~~'))]) {
+            console.log('Deu certo')
+        }
+    }
+    html = html.replace(/~~.*?~~/g, "")
     return html
 }

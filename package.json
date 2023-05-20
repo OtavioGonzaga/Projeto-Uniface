@@ -5,7 +5,8 @@
   "license": "MIT",
   "scripts": {
     "start": "nodemon src/index.ts",
-    "dev": "sucrase ./src -d ./dist --transforms typescript,imports"
+    "dev": "sucrase ./src -d ./dist --transforms typescript,imports",
+    "exe": "nodemon dist/index.js"
   },
   "dependencies": {
     "@types/express": "^4.17.17",
